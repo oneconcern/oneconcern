@@ -31,6 +31,7 @@ yarn dev
 
 ## Deployment
 Continuous Deployment is setup using the [git-flow](http://nvie.com/posts/a-successful-git-branching-model/) workflow with [aeonian](https://github.com/acidjazz/aeonian) via [Circle-CI](https://circleci.com/gh/oneconcern/oneconcern)
+
 <<<<<<< HEAD
 =======
 
