@@ -5,22 +5,22 @@
       include ../../static/watermark.svg
     .hero-title(v-if="tag !== ''")
       span Matching "{{ tag }}"
-      nuxt-link.close(to="/blog")
+      nuxt-link.close(:to="`/${$store.state.i18n.locale}/blog`")
         .fa.fa-times
     .hero-title(v-else) {{ copy }}
   FeaturedPosts(:posts="featured",v-if="tag === ''")
   RecentUpdates(:posts="posts",:title="tag === ''",v-if="tag !== ''")
   RecentUpdates(:posts="allposts",:title="true")
   PopularTags(:tags="tags",v-if="tags")
-  ViewOpenings
+  ViewOpenings(:copys="aboutCopys")
 </template>
 
 <script>
-import { createClient } from '~/plugins/contentful.js'
-import FeaturedPosts from '~/components/pages/blog/FeaturedPosts'
-import RecentUpdates from '~/components/pages/blog/RecentUpdates'
-import PopularTags from '~/components/pages/blog/PopularTags'
-import ViewOpenings from '~/components/modules/ViewOpenings'
+import { createClient } from '@/plugins/contentful.js'
+import FeaturedPosts from '@/components/pages/blog/FeaturedPosts'
+import RecentUpdates from '@/components/pages/blog/RecentUpdates'
+import PopularTags from '@/components/pages/blog/PopularTags'
+import ViewOpenings from '@/components/modules/ViewOpenings'
 const client = createClient()
 export default {
 
@@ -31,6 +31,12 @@ export default {
     const hero = await client.getEntries({'content_type': 'hero','fields.page': 'blog'})
     const entriesCreated = await client.getEntries({'content_type': 'blog', order: '-fields.created'})
     const entriesFeatured = await client.getEntries({'content_type': 'blog', order: '-fields.featured'})
+
+    const aboutCopy = await client.getEntries({'content_type': 'aboutCopy'})
+
+    let aboutCopys = {}
+    for (let entry of aboutCopy.items)
+      aboutCopys[entry.fields.name] = entry.fields.copy
 
     let posts = []
     let featured = []
@@ -87,6 +93,7 @@ export default {
       allposts: posts,
       allfeatured: featured,
       unsortedTags: tags,
+      aboutCopys: aboutCopys,
     }
   },
 
@@ -144,6 +151,6 @@ export default {
       tag: '',
     }
   },
-    
+
 }
 </script>

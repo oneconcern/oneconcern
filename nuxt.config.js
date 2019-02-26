@@ -61,6 +61,7 @@ module.exports = {
     ],
 
     script: [
+      // { src: 'https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js', integrity: 'sha256-LlHVI5rUauudM5ZcZaD6hHPHKrA7CSefHHnKgq+/AZc=', crossorigin: 'anonymous' },
       { src: '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js' },
     ],
 
@@ -69,13 +70,13 @@ module.exports = {
   ** Customize the progress bar color
   */
   loading: { color: '#3B8070' },
-  /* 
+  /*
   ** css frameowrk
   */
   // css: [{ src: '~assets/stylus/main.styl', lang: 'stylus' }],
   plugins: [
     '~/plugins/contentful.js',
-    {src: '~plugins/ga.js', ssr: false},
+    // {src: '~plugins/ga.js', ssr: false},
     {src: '~/plugins/flickity.js', ssr: false},
   ],
   /*
@@ -83,15 +84,40 @@ module.exports = {
   */
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/proxy',
     '@nuxtjs/component-cache',
+    ['nuxt-i18n', {
+      strategy: 'prefix_and_default',
+      deafultLocale: 'en',
+      fallbackLocale: 'en',
+      noPrefixDefaultLocale: true,
+      locales: [
+        {
+          code: 'en',
+          iso: 'en-US',
+          name: 'English',
+        },
+        {
+          code: 'jp',
+          iso: 'ja',
+          name: 'Japanese',
+        },
+      ],
+      rootRedirect: 'en',
+      vueI18n: { fallbackLocale: 'en' },
+      seo: false,
+    }],
+    // '@nuxtjs/redirect-module',
+  ],
+  redirect: [
+    { from: '^/product', to: '/en/product' },
+    { from: '^/mission', to: '/en/mission' },
+    { from: '^/about', to: '/en/about' },
+    { from: '^/careers', to: '/en/careers' },
+    { from: '^/blog', to: '/en/blog' },
   ],
 
   generate: { routes },
   build: {
-    vendor: [
-      // 'babel-polyfill',
-    ],
     /*
     ** Run ESLint on save
     */

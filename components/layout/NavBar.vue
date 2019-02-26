@@ -1,6 +1,6 @@
 <template lang="pug">
 nav.navbar(:class="{dark: darken}")
-  router-link.navbar-logo(to="/")
+  router-link.navbar-logo(:to="`/${$store.state.i18n.locale}`")
   .navbar-burger(:class="{'is-active': burger}",@click="burger = !burger")
     span
     span
@@ -12,11 +12,14 @@ nav.navbar(:class="{dark: darken}")
       :key="route"
       :class="{active: $route.name === route}"
       @click.native="burger = false"
-      :to="`/${route}`")
-      span {{ item.copy }} 
+      :to="`/${$store.state.i18n.locale}/${route}`")
+      span {{ item.copy }}
       .line
-    //CtaButton(name="REQUEST A DEMO",theme="white",:width=160,link="mailto:contact@oneconcern.com")
-    CtaButton(name="REQUEST A DEMO",theme="white",:width=160,:callback="demo")
+    CtaButton(:name="$store.state.layoutCopy.ctaDemo",theme="white",:width=160,:callback="demo")
+    .navbar-item
+      nuxt-link(:to="switchLocalePath('en')") en
+      span &nbsp;
+      nuxt-link(:to="switchLocalePath('jp')") jp
   .clear
 </template>
 
@@ -29,7 +32,6 @@ export default {
       window.addEventListener('scroll', this.scroll)
       this.scroll()
    }
-
   },
   destroyed () {
     if (process.browser) {
@@ -61,11 +63,11 @@ export default {
       burger: false,
       darken: false,
       menu: {
-        product: { copy: 'What We Do' },
-        mission: { copy: 'What We Believe', },
-        about: { copy: 'Who We Are', },
-        careers: { copy: 'Join the Team', },
-        blog: { copy: 'Recent Updates' },
+        product: { copy: this.$store.state.layoutCopy.menuProduct },
+        mission: { copy: this.$store.state.layoutCopy.menuMission },
+        about: { copy: this.$store.state.layoutCopy.menuAbout },
+        careers: { copy: this.$store.state.layoutCopy.menuCareers },
+        blog: { copy: this.$store.state.layoutCopy.menuBlog },
       },
     }
   },
@@ -131,6 +133,9 @@ nav.navbar
   position relative
   padding 8px
   transition color 0.2s ease, color 0.1s ease
+  a
+    color white
+    text-decoration none
   &.active > .line
     left 0
     right 0
@@ -173,7 +178,7 @@ nav.navbar
   &.is-active span
     &:nth-child(2)
       opacity 0
-  &.is-active 
+  &.is-active
     transform rotate(90deg)
   &.is-active span
     &:nth-child(3)

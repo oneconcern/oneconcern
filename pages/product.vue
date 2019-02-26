@@ -1,5 +1,5 @@
 <template lang="pug">
-#Product 
+#Product
   .hero(:style="`background-image: url(${lowres})`")
     img.hero-background(:src="image")
     .hero-title {{ copy }}
@@ -7,13 +7,13 @@
 
   UserStories(v-if="stories.length > 0",:stories="stories",:title="titles[1]")
   ProductAllow(:allows="allows",:title="titles[2]")
-  SeismicFlood(:data="seismicFlood")
-  OrangeBlock
+  SeismicFlood(:data="seismicFlood",:copy="seismicFloodCopy")
+  OrangeBlock(:copys="copys")
 
   //.quote
     .copy(v-in-viewport.once) {{ copys.quoteTop }}
   HumanRace(:title="copys.titleHumanRace",:copy="copys.HumanRace")
-  FeaturedCaseStudy(:copy="copys.CaseStudy")
+  FeaturedCaseStudy(:copy="copys.CaseStudy",:buttonCopy="copys.featuredCaseStudyButton")
   DigitalFingerprints(:title="copys.fingerprintsTitle",:copy="copys.fingerprintsCopy")
   QuoteMonitor(
     :residential="copys.monitorResidential"
@@ -23,26 +23,28 @@
   .demo-cta
     .cta
       //CtaButton(name="REQUEST A DEMO",theme="white",link="mailto:contact@oneconcern.com")
-      CtaButton(name="REQUEST A DEMO",theme="white",:callback="demo",v-in-viewport.once)
+      CtaButton(:name="copys.requestDemoButton",theme="white",:callback="demo",v-in-viewport.once)
 </template>
 
 <script>
-import { createClient } from '~/plugins/contentful.js'
-import inViewportDirective from 'vue-in-viewport-directive'
-import UserStories from '~/components/pages/product/UserStories'
-import ProductAllow from '~/components/pages/product/ProductAllow'
-import SeismicFlood from '~/components/pages/product/SeismicFlood'
-import OrangeBlock from '~/components/pages/product/OrangeBlock'
-import HumanRace from '~/components/pages/product/HumanRace'
-import FeaturedCaseStudy from '~/components/pages/product/FeaturedCaseStudy'
-import DigitalFingerprints from '~/components/pages/product/DigitalFingerprints'
-import QuoteMonitor from '~/components/pages/product/QuoteMonitor'
-import BeforeAfter from '~/components/pages/product/BeforeAfter'
-import ScrollDown from '~/components/modules/ScrollDown'
-import CtaButton from '~/components/buttons/CtaButton'
+import { createClient } from '@/plugins/contentful.js'
 const client = createClient()
+
+import inViewportDirective from 'vue-in-viewport-directive'
+import UserStories from '@/components/pages/product/UserStories'
+import ProductAllow from '@/components/pages/product/ProductAllow'
+import SeismicFlood from '@/components/pages/product/SeismicFlood'
+import OrangeBlock from '@/components/pages/product/OrangeBlock'
+import HumanRace from '@/components/pages/product/HumanRace'
+import FeaturedCaseStudy from '@/components/pages/product/FeaturedCaseStudy'
+import DigitalFingerprints from '@/components/pages/product/DigitalFingerprints'
+import QuoteMonitor from '@/components/pages/product/QuoteMonitor'
+import BeforeAfter from '@/components/pages/product/BeforeAfter'
+import ScrollDown from '@/components/modules/ScrollDown'
+import CtaButton from '@/components/buttons/CtaButton'
+
 export default {
-  components: { 
+  components: {
     HumanRace,
     FeaturedCaseStudy,
     DigitalFingerprints,
@@ -56,19 +58,22 @@ export default {
     OrangeBlock,
   },
   directives: { 'in-viewport': inViewportDirective },
-  async asyncData () {
-    const hero = await client.getEntries({ 'content_type': 'hero', 'fields.page': 'product'})
-    const story = await client.getEntries({'content_type': 'productVideo'})
-    const text = await client.getEntries({ 'content_type': 'productCopy'})
-    const HumanRaceEntries = await client.getEntries({ 'content_type': 'humanRace'})
-    const BeforeAfterEntries = await client.getEntries({ 'content_type': 'beforeAfter', order: 'fields.order'})
-    const CaseStudyEntry = await client.getEntries({ 'content_type': 'caseStudy'})
+  async asyncData ({ app, params, store }) {
+    let iso = { en: 'en-US', jp: 'ja' }
+    let locale = iso[store.state.i18n.locale]
+
+    const hero = await client.getEntries({locale: locale, content_type: 'hero', 'fields.page': 'product'})
+    const story = await client.getEntries({locale: locale, 'content_type': 'productVideo'})
+    const text = await client.getEntries({locale: locale, 'content_type': 'productCopy'})
+    const HumanRaceEntries = await client.getEntries({locale: locale, 'content_type': 'humanRace'})
+    const BeforeAfterEntries = await client.getEntries({locale: locale, 'content_type': 'beforeAfter', order: 'fields.order'})
+    const CaseStudyEntry = await client.getEntries({locale: locale, 'content_type': 'caseStudy'})
     const CaseStudyBlogEntry = await client.getEntry(CaseStudyEntry.items[0].fields.blog.sys.id)
 
-    const userStory = await client.getEntries({'content_type': 'userStory', order: 'fields.order'})
-    const productAllow = await client.getEntries({'content_type': 'productAllow', order: 'fields.order'})
-    const seismicFlood = await client.getEntries({'content_type': 'seismicFlood'})
-    const productTitle = await client.getEntries({'content_type': 'productTitle'})
+    const userStory = await client.getEntries({locale: locale, 'content_type': 'userStory', order: 'fields.order'})
+    const productAllow = await client.getEntries({locale: locale, 'content_type': 'productAllow', order: 'fields.order'})
+    const seismicFlood = await client.getEntries({locale: locale, 'content_type': 'seismicFlood'})
+    const productTitle = await client.getEntries({locale: locale, 'content_type': 'productTitle'})
 
     let copys = {}
     for (let entry of text.items) {
@@ -138,6 +143,10 @@ export default {
       allows: allows,
       copys: copys,
       seismicFlood: seismicFlood,
+      seismicFloodCopy: {
+        buttonFlood: copys.buttonFlood,
+        buttonSeismic: copys.buttonSeismic,
+      },
       titles: titles,
     }
   },

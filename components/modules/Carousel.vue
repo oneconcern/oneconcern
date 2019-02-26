@@ -13,7 +13,7 @@
         .carousel-title {{ carousel.title }}
         .carousel-description {{ carousel.description }}
         .carousel-cta
-          CtaButton(:link="carousel.cta.link",:name="carousel.cta.name",theme="orange-border")
+          CtaButton(:link="`${$store.state.i18n.locale}/${carousel.cta.link}`",:name="carousel.cta.name",theme="orange-border")
   .carousel-dots
     .carousel-dot(
       @click="dot(cindex)",
@@ -38,12 +38,12 @@ export default {
     },
     next () {
       if (this.scrolling) return true
-      this.index = (this.index === this.data.length - 1) ? 0 : this.index+1 
+      this.index = (this.index === this.data.length - 1) ? 0 : this.index+1
       this.pause()
     },
     prev () {
       if (this.scrolling) return true
-      this.index = (this.index === 0) ? this.data.length-1 : this.index-1 
+      this.index = (this.index === 0) ? this.data.length-1 : this.index-1
       this.pause()
     },
     pause () {
@@ -72,8 +72,8 @@ export default {
   },
   created () {
 
-    this.timer = setInterval(() => { 
-      (this.index === this.data.length - 1) ? this.index = 0 : this.index++ 
+    this.timer = setInterval(() => {
+      (this.index === this.data.length - 1) ? this.index = 0 : this.index++
     }, this.interval*1000)
   },
 
@@ -109,7 +109,7 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 @import '../../assets/stylus/guide/includes/*'
 
 #Carousel
