@@ -1,8 +1,6 @@
 <template lang="pug">
 #Who.page
-  .hero(:style="`background-image: url(${lowres})`")
-    img.hero-background(:src="image")
-    .hero-title {{ copy }}
+  PageHero(:lowres="lowres",:image="image",:copy="copy")
 
   ScrollDown
   .section.section-story(v-if="story")
@@ -33,14 +31,25 @@
 import { createClient } from '@/plugins/contentful.js'
 import inViewportDirective from 'vue-in-viewport-directive'
 import ViewOpenings from '@/components/modules/ViewOpenings'
+import PageHero from '@/components/modules/PageHero'
 import CtaButton from '@/components/buttons/CtaButton'
 import ScrollDown from '@/components/modules/ScrollDown'
 import OurTeam from '@/components/pages/about/OurTeam'
 const client = createClient()
 export default {
 
-  components: { CtaButton, OurTeam, ViewOpenings, ScrollDown },
+  components: { CtaButton, OurTeam, ViewOpenings, ScrollDown, PageHero },
   directives: { 'in-viewport': inViewportDirective },
+  data () {
+    return {
+      filter: false,
+    }
+  },
+  computed: {
+    storyCopy () {
+      return this.story.copy.split("\n")
+    },
+  },
   async asyncData () {
 
     const copy = await client.getEntries({'content_type': 'aboutCopy'})
@@ -83,18 +92,6 @@ export default {
     },
   },
 
-  computed: {
-    storyCopy () {
-      return this.story.copy.split("\n")
-    },
-
-  },
-
-  data () {
-    return {
-      filter: false,
-    }
-  },
 
 }
 </script>
