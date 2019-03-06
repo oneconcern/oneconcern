@@ -18,13 +18,13 @@ nav.navbar(:class="{dark: darken}")
       .line
     CtaButton(:name="$store.state.layoutCopy.ctaDemo",theme="white",:width=160,:callback="demo")
     .navbar-item
-      nuxt-link(
-        to="/",
+      a(
+        href="/",
         :class="{'is-active': $store.state.i18n.locale === 'en'}").flag
         img(src="/flag_en.jpg")
       span &nbsp;
-      nuxt-link(
-        to="/jp",
+      a(
+        href="/jp",
         :class="{'is-active': $store.state.i18n.locale === 'jp'}").flag
         img(src="/flag_jp.jpg")
   .clear
@@ -47,7 +47,7 @@ export default {
         blog: { copy: this.$store.state.layoutCopy.menuBlog },
       },
 
-      locale_support: [ 'product','mission' ],
+      locale_support: [ 'product', 'mission' ],
     }
   },
   computed: { ...mapGetters(['is_en', 'is_not_en', 'is_jp']), },
