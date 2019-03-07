@@ -13,9 +13,13 @@ const client = createClient()
 export default {
   components: {  BenevolentAi },
 
-  async asyncData () {
-    const AiCopy = await client.getEntries({'content_type': 'aiCopy'})
-    const AiCarousel = await client.getEntries({'content_type': 'aiCarousel'})
+  async asyncData ({ app, params, store }) {
+
+    let iso = { en: 'en-US', jp: 'ja' }
+    let locale = iso[store.state.i18n.locale]
+
+    const AiCopy = await client.getEntries({locale: locale, 'content_type': 'aiCopy'})
+    const AiCarousel = await client.getEntries({locale: locale, 'content_type': 'aiCarousel'})
 
     let Carousel = []
 

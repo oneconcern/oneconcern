@@ -50,12 +50,14 @@ export default {
       return this.story.copy.split("\n")
     },
   },
-  async asyncData () {
+  async asyncData ({ app, params, store }) {
+    let iso = { en: 'en-US', jp: 'ja' }
+    let locale = iso[store.state.i18n.locale]
 
-    const copy = await client.getEntries({'content_type': 'aboutCopy'})
-    const hero = await client.getEntries({'content_type': 'hero','fields.page': 'about'})
-    const story = await client.getEntries({'content_type': 'aboutContent'})
-    const members = await client.getEntries({ 'content_type': 'team', order: 'fields.order'})
+    const copy = await client.getEntries({locale: locale, 'content_type': 'aboutCopy'})
+    const hero = await client.getEntries({locale: locale, 'content_type': 'hero','fields.page': 'about'})
+    const story = await client.getEntries({locale: locale, 'content_type': 'aboutContent'})
+    const members = await client.getEntries({locale: locale,  'content_type': 'team', order: 'fields.order'})
 
     let copys = {}
     for (let entry of copy.items)
