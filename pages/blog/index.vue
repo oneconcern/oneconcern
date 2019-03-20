@@ -8,10 +8,10 @@
       nuxt-link.close(to="/blog")
         .fa.fa-times
     .hero-title(v-else) {{ copy }}
-  FeaturedPosts(:posts="featured",v-if="tag === ''")
-  RecentUpdates(:posts="posts",:title="tag === ''",v-if="tag !== ''")
-  RecentUpdates(:posts="allposts",:title="true")
-  PopularTags(:tags="tags",v-if="tags")
+  FeaturedPosts(:posts="featured",v-if="tag === ''",:copys="copys")
+  RecentUpdates(:posts="posts",:title="tag === ''",v-if="tag !== ''",:copys="copys")
+  RecentUpdates(:posts="allposts",:title="true",:copys="copys")
+  PopularTags(v-if="tags && is_en",:tags="tags",:copys="copys")
   ViewOpenings(:copys="aboutCopys")
 </template>
 
@@ -22,6 +22,7 @@ import RecentUpdates from '@/components/pages/blog/RecentUpdates'
 import PopularTags from '@/components/pages/blog/PopularTags'
 import ViewOpenings from '@/components/modules/ViewOpenings'
 const client = createClient()
+import { mapGetters } from 'vuex'
 export default {
   components: { FeaturedPosts, RecentUpdates, ViewOpenings, PopularTags },
   data () {
@@ -32,6 +33,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['is_en', 'is_not_en', 'is_jp']),
 
     tags () {
 
@@ -85,6 +87,11 @@ export default {
     const entriesFeatured = await client.getEntries({locale: locale, 'content_type': 'blog', order: '-fields.featured'})
 
     const aboutCopy = await client.getEntries({locale: locale, 'content_type': 'aboutCopy'})
+    const blogCopy = await client.getEntries({locale: locale, 'content_type': 'blogCopy'})
+
+    let copys = {}
+    for (let entry of blogCopy.items)
+      copys[entry.fields.name] = entry.fields.copy
 
     let aboutCopys = {}
     for (let entry of aboutCopy.items)
@@ -147,6 +154,7 @@ export default {
       allfeatured: featured,
       unsortedTags: tags,
       aboutCopys: aboutCopys,
+      copys: copys,
     }
   },
 
