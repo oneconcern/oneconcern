@@ -14,7 +14,6 @@
     "cash": "node operations/cache.js",
     "production": "node operations/aeonian.js production",
     "staging": "node operations/aeonian.js staging",
-    "development": "node operations/aeonian.js dev",
     "test": "echo No tests yet"
   },
   "dependencies": {
