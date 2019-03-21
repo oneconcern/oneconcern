@@ -1,7 +1,9 @@
 require('aeonian').config({
   bucket: {
     localDir: './dist/',
-    prefix: '1c-'
+    prefix: '1c-',
+    region: 'us-east-1',
+    remove_old: false,
   },
   environments: {
 
@@ -10,8 +12,7 @@ require('aeonian').config({
     staging: 'E1OCUBYNGDRQHE',
     development: 'CLOUDFRONTID',
 
-    // - dev id's
-    /*
+    /* - dev id's
     production: 'E26T22R6AY0TYO',
     staging: 'E1C7VZR7WZRWBN',
     */
