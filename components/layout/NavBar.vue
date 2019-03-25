@@ -1,35 +1,68 @@
 <template lang="pug">
 nav.navbar(:class="{dark: darken}")
-  router-link.navbar-logo(to="/")
+  nuxt-link.navbar-logo(:to="localePath('index')")
   .navbar-burger(:class="{'is-active': burger}",@click="burger = !burger")
     span
     span
     span
   .navbar-menu
-    router-link.navbar-logo-mobile(to="/")
-    router-link.navbar-item(
+    nuxt-link.navbar-logo-mobile(:to="localePath('index')")
+    nuxt-link.navbar-item(
       v-for="item, route in menu"
+      v-if="is_en || is_not_en && locale_support.includes(route)",
       :key="route"
-      :class="{active: $route.name === route}"
+      :class="{active: $route.name && $route.name.indexOf(route) !== -1}"
       @click.native="burger = false"
-      :to="`/${route}`")
-      span {{ item.copy }} 
+      :to="localePath(route)")
+      span {{ item.copy }}
       .line
-    //CtaButton(name="REQUEST A DEMO",theme="white",:width=160,link="mailto:contact@oneconcern.com")
-    CtaButton(name="REQUEST A DEMO",theme="white",:width=160,:callback="demo")
+    CtaButton(:name="$store.state.layoutCopy.ctaDemo",theme="white",:width=160,:callback="demo")
+    .navbar-item
+      a(
+        href="/",
+        :class="{'is-active': $store.state.i18n.locale === 'en'}").flag
+        img(src="/flag_en.jpg")
+      span &nbsp;
+      a(
+        href="/jp",
+        :class="{'is-active': $store.state.i18n.locale === 'jp'}").flag
+        img(src="/flag_jp.jpg")
   .clear
 </template>
 
 <script>
 import CtaButton from '~/components/buttons/CtaButton'
+import { mapGetters } from 'vuex'
 export default {
   components: { CtaButton },
+  data () {
+    return {
+      burger: false,
+      darken: false,
+      menu: {
+        product: { copy: this.$store.state.layoutCopy.menuProduct },
+        mission: { copy: this.$store.state.layoutCopy.menuMission },
+        about: { copy: this.$store.state.layoutCopy.menuAbout },
+        careers: { copy: this.$store.state.layoutCopy.menuCareers },
+        blog: { copy: this.$store.state.layoutCopy.menuBlog },
+      },
+      locale_support: [ 'product', 'mission', 'blog' ],
+    }
+  },
+  computed: { ...mapGetters(['is_en', 'is_not_en', 'is_jp']), },
+  watch: {
+    '$route' (to, from) {
+      if (to.name === 'index') {
+        return true
+      }
+    }
+  },
+
   created () {
     if (process.browser) {
       window.addEventListener('scroll', this.scroll)
       this.scroll()
    }
-
   },
   destroyed () {
     if (process.browser) {
@@ -48,26 +81,6 @@ export default {
         this.darken = false
       }
     },
-  },
-  watch: {
-    '$route' (to, from) {
-      if (to.name === 'index') {
-        return true
-      }
-    }
-  },
-  data () {
-    return {
-      burger: false,
-      darken: false,
-      menu: {
-        product: { copy: 'What We Do' },
-        mission: { copy: 'What We Believe', },
-        about: { copy: 'Who We Are', },
-        careers: { copy: 'Join the Team', },
-        blog: { copy: 'Recent Updates' },
-      },
-    }
   },
 }
 </script>
@@ -131,6 +144,9 @@ nav.navbar
   position relative
   padding 8px
   transition color 0.2s ease, color 0.1s ease
+  a
+    color white
+    text-decoration none
   &.active > .line
     left 0
     right 0
@@ -144,6 +160,11 @@ nav.navbar
     bottom 0
     background-color white
     transition all 0.2s ease-in-out 0.3s
+  .flag
+    img
+      width 16px
+    &.is-active
+      border-bottom 1px solid white
 
 .navbar-burger
   display none
@@ -173,7 +194,7 @@ nav.navbar
   &.is-active span
     &:nth-child(2)
       opacity 0
-  &.is-active 
+  &.is-active
     transform rotate(90deg)
   &.is-active span
     &:nth-child(3)

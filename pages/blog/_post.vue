@@ -6,22 +6,30 @@
     .hero-title {{ post.title }}
 
   BlogPost(:post="post")
-  ViewOpenings
-
+  ViewOpenings(:copys="aboutCopys")
 </template>
 
 <script>
-import { createClient } from '~/plugins/contentful.js'
-import BlogPost from '~/components/pages/blog/BlogPost'
-import ViewOpenings from '~/components/modules/ViewOpenings'
+import { createClient } from '@/plugins/contentful.js'
+import BlogPost from '@/components/pages/blog/BlogPost'
+import ViewOpenings from '@/components/modules/ViewOpenings'
 const client = createClient()
 export default {
   components: { BlogPost, ViewOpenings },
-  async asyncData (context) {
-    let params = context.route.params.post.split('-')
-    let id = params[params.length-1]
-    const post = (await client.getEntries({'content_type': 'blog', 'sys.id': id})).items[0]
+  async asyncData ({ app, route, params, store }) {
+    let iso = { en: 'en-US', jp: 'ja' }
+    let locale = iso[store.state.i18n.locale]
+    let uparams = route.params.post.split('-')
+    let id = uparams[uparams.length-1]
+    const post = (await client.getEntries({locale: locale, 'content_type': 'blog', 'sys.id': id})).items[0]
+    const aboutCopy = await client.getEntries({locale: locale, 'content_type': 'aboutCopy'})
+
+    let aboutCopys = {}
+    for (let entry of aboutCopy.items)
+      aboutCopys[entry.fields.name] = entry.fields.copy
+
     return {
+      aboutCopys: aboutCopys,
       post: {
         title: post.fields.title,
         description: post.fields.description,

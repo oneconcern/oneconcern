@@ -1,6 +1,6 @@
 <template lang="pug">
 .perks-benefits
-  .title Perks and Benefits
+  .title {{ copys.perksTitle }}
   .perks-benefits-list
     .perks-benefits-item(v-for="perk in perks",v-in-viewport.once)
       .perks-benefits-inner
@@ -14,8 +14,13 @@ import inViewportDirective from 'vue-in-viewport-directive'
 export default {
   directives: { 'in-viewport': inViewportDirective },
   props: {
+    copys: {
+      type: Object,
+      required: true,
+    },
     perks: {
       type: Array,
+      required: true,
     },
   }
 }

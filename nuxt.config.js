@@ -61,21 +61,22 @@ module.exports = {
     ],
 
     script: [
+      { src: 'https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js', integrity: 'sha256-LlHVI5rUauudM5ZcZaD6hHPHKrA7CSefHHnKgq+/AZc=', crossorigin: 'anonymous' },
       { src: '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js' },
+      { src: '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/ja.js' },
     ],
 
   },
   /*
   ** Customize the progress bar color
   */
-  loading: { color: '#3B8070' },
-  /* 
+  loading: { color: '#f29220' },
+  /*
   ** css frameowrk
   */
   // css: [{ src: '~assets/stylus/main.styl', lang: 'stylus' }],
   plugins: [
     '~/plugins/contentful.js',
-    {src: '~plugins/ga.js', ssr: false},
     {src: '~/plugins/flickity.js', ssr: false},
   ],
   /*
@@ -83,15 +84,32 @@ module.exports = {
   */
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/proxy',
     '@nuxtjs/component-cache',
+    ['@nuxtjs/moment', ['ja']],
+    ['@nuxtjs/google-tag-manager', { id: 'GTM-K59VVGC' }],
+    ['nuxt-i18n', {
+      strategy: 'prefix_except_default',
+      defaultLocale: 'en',
+      fallbackLocale: 'en',
+      noPrefixDefaultLocale: true,
+      locales: [
+        {
+          code: 'en',
+          iso: 'en-US',
+          name: 'English',
+        },
+        {
+          code: 'jp',
+          iso: 'ja',
+          name: 'Japanese',
+        },
+      ],
+      vueI18n: { fallbackLocale: 'en' },
+      seo: false,
+    }],
   ],
-
   generate: { routes },
   build: {
-    vendor: [
-      // 'babel-polyfill',
-    ],
     /*
     ** Run ESLint on save
     */

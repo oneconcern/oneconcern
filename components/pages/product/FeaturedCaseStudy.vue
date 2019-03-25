@@ -4,37 +4,44 @@
   .case-study-case
     .case-study-image(v-in-viewport.once,:style="`background-image: url(${copy.image})`")
     .case-study-copy
-      .case-study-quote(v-in-viewport.once) "{{ copy.quote }}"
+      .case-study-quote(v-in-viewport.once) {{ copy.quote }}
       .case-study-author(v-in-viewport.once) {{ copy.author }}
   .case-study-cta(v-in-viewport.once)
     CtaButton(
+      v-if="buttonCopy !== 'DISABLED'",
+      :locale="false",
       :link="`blog/${slug(copy.blog.title)}-${copy.blog.id}`",
-      name="see full case study",
+      :name="buttonCopy",
       theme="dark-border")
 </template>
 <script>
 import CtaButton from '~/components/buttons/CtaButton'
 import inViewportDirective from 'vue-in-viewport-directive'
+import { mapGetters } from 'vuex'
 const getSlug = require('speakingurl')
 export default {
   components: { CtaButton },
   directives: { 'in-viewport': inViewportDirective },
-
   props: {
+    buttonCopy: {
+      type: String,
+      required: true,
+    },
     copy: {
       type: Object,
+      required: true,
     },
   },
+  data () {
+    return {
+    }
+  },
+  computed: { ...mapGetters(['is_en', 'is_not_en', 'is_jp']), },
   methods: {
     slug (title) {
       return getSlug(title)
     },
   },
-
-  data () {
-    return {
-    }
-  }
 }
 </script>
 

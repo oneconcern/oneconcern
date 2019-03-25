@@ -1,15 +1,24 @@
 <template lang="pug">
 footer.footer(:class="{solid: fixed.indexOf($route.name) === -1, white: $route.name === 'careers'}")
-  .footer-left &copy;2018 One Concern, Inc.  All Rights Reserved
+  .footer-left
+    span(v-html="$store.state.layoutCopy.footerCopyright")
+    .footer-item
+    nuxt-link.footer-item(
+      v-if="$store.state.layoutCopy.ctaPrivacy !== 'DISABLED'",
+      :to="localePath('privacy')") {{ this.$store.state.layoutCopy.ctaPrivacy }}
+    nuxt-link.footer-item(
+      v-if="$store.state.layoutCopy.ctaTerms !== 'DISABLED'",
+      :to="localePath('terms')") {{ this.$store.state.layoutCopy.ctaTerms }}
+
   .footer-right
-    a.footer-item.footer-item-contact(href="mailto:contact@oneconcern.com") Contact Us
-    a.footer-item(href="https://www.facebook.com/oneconcern",target="_new")
+    a.footer-item.footer-item-contact(:href="`mailto:${copy.footerEmail}`") {{ this.$store.state.layoutCopy.ctaContact }}
+    a.footer-item(:href="copy.footerFacebook",target="_new")
       span.fa.fa-facebook
-    a.footer-item(href="https://twitter.com/oneconcerninc",target="_new")
+    a.footer-item(:href="copy.footerTwitter",target="_new")
       span.fa.fa-twitter
-    a.footer-item(href="https://www.linkedin.com/company/oneconcern/",target="_new")
+    a.footer-item(:href="copy.footerLinkedIn",target="_new")
       span.fa.fa-linkedin
-    a.footer-item(href="https://angel.co/one-concern",target="_new")
+    a.footer-item(:href="copy.footerAngel",target="_new")
       span.fa.fa-angellist
 </template>
 
@@ -21,6 +30,9 @@ export default {
     return {
       'fixed': ['index','ai','error'],
     }
+  },
+  computed: {
+    copy () { return this.$store.state.layoutCopy },
   },
 }
 </script>
@@ -54,7 +66,6 @@ footer.footer
 .footer-right
   float right
   font-s2()
-
 
 .footer-item
   display inline-block

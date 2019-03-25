@@ -1,22 +1,28 @@
 <template lang="pug">
 .popular-tags
-  .title(v-in-viewport.once) Popular Tags
+  .title(v-in-viewport.once) {{ copys.popularTags }}
   .tags
     a.tag(
-      :href="`/blog/?tag=${tag[0]}#${tag[0]}`",
+      :href="`${locale === 'en' ? '/' : '/jp'}/blog/?tag=${tag[0]}#${tag[0]}`",
       v-for="tag, index in tags",
       :key="index",
       v-if="index < limit",
       v-in-viewport.once)
       span.copy {{ tag[0] }}
-      span.comma(v-if="index !== limit-1") , 
+      span.comma(v-if="index !== limit-1") ,&nbsp;
 </template>
 
 <script>
+import locale from '@/mixins/locale'
 import inViewportDirective from 'vue-in-viewport-directive'
 export default {
   directives: { 'in-viewport': inViewportDirective },
+  mixins: [ locale ],
   props: {
+    copys: {
+      type: Object,
+      required: true,
+    },
     limit: {
       type: Number,
       required: false,

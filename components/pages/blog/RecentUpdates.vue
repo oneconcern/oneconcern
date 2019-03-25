@@ -1,6 +1,6 @@
 <template lang="pug">
 .recent-updates
-  .title(v-if="title") Recent Updates
+  .title(v-if="title") {{ copys.title }}
   .recent-updates-list
     .recent-update(
       v-for="post, index in listing",
@@ -14,25 +14,34 @@
           :style="`background-image: url(${post.image})`")
         .recent-update-copy
           .recent-update-title(v-in-viewport.once) {{ post.title }}
-          .recent-update-author(v-in-viewport.once,v-if="post.author.name") by {{ post.author.name }}, {{ post.author.position }}
-          .recent-update-date(v-in-viewport.once) {{ post.date | moment("dddd, MMM Do, YYYY") }}
+          .recent-update-author(v-in-viewport.once,v-if="post.author.name") {{ post.author.name }} - {{ post.author.position }}
+          .recent-update-date(v-in-viewport.once) {{ date(post.date)}}
         .recent-update-cta(v-in-viewport.once)
-          CtaButton(v-if="post.type === 'link'",
-            :link="post.link",name="view article",theme="orange-border", :width=140)
+          CtaButton(
+            v-if="post.type === 'link'",
+            :link="post.link",
+            :name="copys.viewArticle",
+            theme="orange-border",
+            :width=140)
           CtaButton(v-else,
-            :link="`blog/${slug(post.title)}-${post.id}`",name="view article",theme="orange-border", :width=140)
+            :link="blog_path(post)",
+            :name="copys.viewArticle",
+            theme="orange-border",
+            :width=140)
       .recent-update-border(v-in-viewport.once)
   .recent-updates-more(v-in-viewport.once,v-if="posts.length > 4")
-    CtaButton(v-if="!more", :callback="showmore",name="show more",theme="orange-border")
+    CtaButton(v-if="!more", :callback="showmore",:name="copys.showMore",theme="orange-border")
 </template>
 
 <script>
+import locale from '@/mixins/locale'
 import inViewportDirective from 'vue-in-viewport-directive'
 const getSlug = require('speakingurl')
 import CtaButton from '~/components/buttons/CtaButton'
 export default {
   components: { CtaButton },
   directives: { 'in-viewport': inViewportDirective },
+  mixins: [ locale ],
   props: {
     posts: {
       required: true,
@@ -42,7 +51,28 @@ export default {
       required: true,
       type: Boolean,
     },
+    copys: {
+      type: Object,
+      required: true,
+    },
   },
+    data () {
+    return {
+      more: false,
+    }
+  },
+  computed: {
+    listing () {
+      if (this.more === true) {
+        return this.posts_filtered
+      }
+      return this.posts_filtered.slice(0, 4)
+    },
+    posts_filtered () {
+      return this.posts.filter( entry => entry.locale && entry.locale.includes(this.locale) )
+    },
+  },
+
   methods: {
     slug (title) {
       return getSlug(title)
@@ -51,28 +81,6 @@ export default {
       this.more = true
     },
   },
-  filters: {
-    moment: function(date, format) {
-      if (process.browser) {
-        return window.moment(date).format(format)
-      }
-      return date
-    },
-  },
-
-  computed: {
-    listing () {
-      if (this.more === true) {
-        return this.posts
-      }
-      return this.posts.slice(0, 4)
-    },
-  },
-  data () {
-    return {
-      more: false,
-    }
-  }
 }
 </script>
 

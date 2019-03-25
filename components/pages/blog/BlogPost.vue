@@ -6,9 +6,9 @@
         .blog-post-author-image(:style="`background-image: url(${post.author.image});`",v-in-viewport.once)
         .blog-post-author-name(v-in-viewport.once) {{ post.author.name }}
         .blog-post-author-position(v-in-viewport.once) {{ post.author.position }}
-      .blog-post-date(v-in-viewport.once) {{ post.date | moment("dddd, MMM Do, YYYY") }}
-      .blog-post-tags(v-in-viewport.once)
-        span.blog-post-tag(v-for="tag, index in post.tags") 
+      .blog-post-date(v-in-viewport.once) {{ date(post.date) }}
+      .blog-post-tags(v-in-viewport.once,v-if="is_en")
+        span.blog-post-tag(v-for="tag, index in post.tags")
           nuxt-link.blog-post-tag-link(:to="`/blog/#${tag}`") {{ tag }}
           span(v-if="index+1 !== post.tags.length") ,&nbsp;
     .blog-post-content#blog-post-content(v-html="content")
@@ -16,20 +16,38 @@
 
 <script>
 import inViewportDirective from 'vue-in-viewport-directive'
+import locale from '@/mixins/locale'
+import { mapGetters } from 'vuex'
 export default {
+  directives: { 'in-viewport': inViewportDirective },
+  mixins: [ locale ],
   props: {
     post: {
       type: Object,
+      required: true,
     },
   },
-  directives: { 'in-viewport': inViewportDirective },
-  filters: {
-    moment: function(date, format) {
-      if (process.browser) {
-        return window.moment(date).format(format)
-      }
-      return date
-    },
+  data () {
+    return {
+      md: false,
+      content: 'Loading..',
+      timer: false,
+    }
+  },
+  computed: {
+    ...mapGetters(['is_en', 'is_not_en', 'is_jp']),
+  },
+  mounted () {
+    this.mdit()
+    if (process.browser && this.content === 'Loading..') {
+      this.timer = setInterval(this.mdit, 400)
+    }
+  },
+  beforeDestroy () {
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = false
+    }
   },
   methods: {
     mdit () {
@@ -42,11 +60,6 @@ export default {
     },
   },
 
-  mounted () {
-    this.mdit()
-    setInterval(this.mdit, 400)
-  },
-
   head () {
     return {
       script: [
@@ -55,12 +68,6 @@ export default {
     }
   },
 
-  data () {
-    return {
-      md: false,
-      content: 'Loading..',
-    }
-  },
 }
 </script>
 

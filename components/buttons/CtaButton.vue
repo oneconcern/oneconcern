@@ -7,18 +7,26 @@
   :data-text="name")
     .before: .copy {{ name }}
     .after: .copy {{ name }}
-router-link.cta-button(
-  v-else-if="link.indexOf(':') === -1",
-  :to="`/${link}`",
+a.cta-button(
+  v-else-if="link.indexOf(':') !== -1",
+  :href="link",
+  :target="target"
   :class="`theme-${theme}`",
   :style="`width: ${width}px`",
   :data-text="name")
     .before: .copy {{ name }}
     .after: .copy {{ name }}
-a.cta-button(
+nuxt-link.cta-button(
+  v-else-if="locale",
+  :to="localePath(link)",
+  :class="`theme-${theme}`",
+  :style="`width: ${width}px`",
+  :data-text="name")
+    .before: .copy {{ name }}
+    .after: .copy {{ name }}
+nuxt-link.cta-button(
   v-else,
-  :href="link",
-  :target="target"
+  :to="link",
   :class="`theme-${theme}`",
   :style="`width: ${width}px`",
   :data-text="name")
@@ -29,9 +37,15 @@ a.cta-button(
 <script>
 export default {
   props: {
+    locale: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     callback: {
       required: false,
-      type: Function,
+      type: [Boolean,Function],
+      default: false,
     },
     link: {
       required: false,
@@ -55,13 +69,6 @@ export default {
       default: 200,
     },
   },
-
-  computed: {
-    target () {
-      return this.link.indexOf('mailto') === -1 ? '_new' : '_self'
-    },
-  },
-
   data () {
     return {
       themes: [
@@ -74,7 +81,11 @@ export default {
       ]
     }
   },
-
+  computed: {
+    target () {
+      return this.link.indexOf('mailto') === -1 ? '_new' : '_self'
+    },
+  },
 }
 </script>
 
@@ -165,8 +176,6 @@ export default {
     > .after
       color white
       background-color fire-bush
-
-
   /*
   &.theme-orange-border
     background-image linear-gradient(-75deg, transparent 50%, fire-bush 50%)

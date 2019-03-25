@@ -2,8 +2,8 @@
 <template lang="pug">
 .section.section-SeismicFlood
   .sf-menu
-    a.sf-item(:class="{'is-active': selection == 'seismic'}",@click="selection = 'seismic'") Seismic
-    a.sf-item(:class="{'is-active': selection == 'flood'}",@click="selection = 'flood'") Flood
+    a.sf-item(:class="{'is-active': selection == 'seismic'}",@click="selection = 'seismic'") {{ copy.buttonSeismic }}
+    a.sf-item(:class="{'is-active': selection == 'flood'}",@click="selection = 'flood'") {{ copy.buttonFlood }}
 
   .sf-content
     transition(name="fade")
@@ -34,13 +34,20 @@ export default {
   props: {
     data: {
       type: Object,
-    }
+      required: true,
+    },
+    copy: {
+      type: Object,
+      required: true,
+    },
   },
 
-  created () {
-    for (let entry of this.data.items) {
-      this[entry.fields.type].image = entry.fields.image.fields.file.url
-      this[entry.fields.type].list = entry.fields.list.split("\n")    }
+  data () {
+    return {
+      selection: 'seismic',
+      seismic: { image: false, list: [],},
+      flood: { image: false, list: [],},
+    }
   },
 
   computed: {
@@ -49,11 +56,10 @@ export default {
     }
   },
 
-  data () {
-    return {
-      selection: 'seismic',
-      seismic: { image: false, list: [],},
-      flood: { image: false, list: [],},
+  created () {
+    for (let entry of this.data.items) {
+      this[entry.fields.type].image = entry.fields.image.fields.file.url
+      this[entry.fields.type].list = entry.fields.list.split("\n")
     }
   },
 

@@ -4,6 +4,11 @@
 
 <script>
 export default {
+  data () {
+    return {
+      visible: false,
+    }
+  },
   created () {
     if (process.browser) {
       window.addEventListener('scroll', this.scroll)
@@ -25,15 +30,8 @@ export default {
       }
     },
   },
-
-  data () {
-    return {
-      visible: false,
-    }
-  }
 }
 </script>
-
 
 <style lang="stylus">
 @import '../../assets/stylus/guide/includes/*'

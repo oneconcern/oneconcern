@@ -5,11 +5,11 @@
     flickity.carousel#UserStories(:options="flickityOptions")
       .story.carousel-cell(
         v-in-viewport,
-        v-for="story in stories",
+        v-for="story in stories_filtered",
         :key="story.youtubId")
         iframe(
           v-if="playing === story.youtubeId",
-          width="98%", 
+          width="98%",
           height="440",
           :src="`https://www.youtube.com/embed/${story.youtubeId}?autoplay=1`",
           frameborder="0",
@@ -17,7 +17,7 @@
           allowfullscreen)
         .story-inner(:style="`background-image: url(${story.thumbnail});`",v-else)
           .story-gradient
-          .story-quote "{{ story.quote }}"
+          .story-quote(:class="{'story-quote-jp': $store.state.i18n.locale === 'jp'}") {{ story.quote }}
           .story-play(@click="playing = story.youtubeId")
             .story-play-triangle
           .story-creds
@@ -27,10 +27,11 @@
 </template>
 
 <script>
+import locale from '@/mixins/locale'
 import inViewportDirective from 'vue-in-viewport-directive'
 export default {
-
   directives: { 'in-viewport': inViewportDirective },
+  mixins: [ locale ],
 
   props: {
     title: {
@@ -51,8 +52,12 @@ export default {
         wrapAround: true,
       },
     }
-  }
-
+  },
+  computed: {
+    stories_filtered () {
+      return this.stories.filter( entry => entry.locale.includes(this.locale) )
+    },
+  },
 }
 </script>
 
@@ -119,6 +124,8 @@ export default {
   text-align left
   width 50%
   font-h4()
+  &.story-quote-jp
+    font-size 20px
 
 .story-play
   cursor pointer

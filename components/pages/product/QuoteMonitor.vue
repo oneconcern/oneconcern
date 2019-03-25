@@ -1,62 +1,40 @@
 <template lang="pug">
 #QuoteMonitor
-  .copy(v-in-viewport.once)
-    | One Concern currently monitors
-    i-count-up.value(:startVal=0,:endVal="numbers.residential",:duration="2.5")
-    | residential and
-    i-count-up.value(:startVal=0,:endVal="numbers.commercial",:duration="2.5")
-    | commercial buildings. We monitor earthquakes for 
-    i-count-up.value(:startVal=0,:endVal="numbers.people/1000000",:duration="2.5",:options="{suffix: 'M'}")
-    |  people.
+  .copy(v-in-viewport.once,v-html="copy_processed")
 </template>
 <script>
-import ICountUp from 'vue-countup-v2'
 import inViewportDirective from 'vue-in-viewport-directive'
 import inViewport from 'vue-in-viewport-mixin'
 export default {
-  components: { ICountUp },
   directives: { 'in-viewport': inViewportDirective },
   mixins: [ inViewport ],
   props: {
-    residential: {
+    copy: {
       type: String,
-    },
-    commercial: {
-      type: String,
-    },
-    people: {
-      type: String,
+      required: true,
     },
   },
-  watch: {
-    'inViewport.now' (visible) {
-      if (this.numbered) {
-        return true
-      }
-      if (visible && this.numbers.residential === 0) {
-        this.numbers.residential = parseInt(this.residential)
-        this.numbers.commercial = parseInt(this.commercial)
-        this.numbers.people = parseInt(this.people)
-        this.numbered = true
-      }
-      if (!visible && this.numbers.residential !== 0) {
-        this.numbers.residential = 0
-        this.numbers.commercial = 0
-        this.numbers.people = 0
-      }
-    }
-  },
-  data () {
-    return {
-      numbered: false,
-      numbers: {
-        residential: 0,
-        commercial: 0,
-        people: 0,
-      }
-    }
-  }
 
+  computed: {
+
+    copy_processed () {
+      let processed = '', words = this.copy.split(' ')
+      for (let word of words) {
+        if (isNaN(word)) {
+          processed = `${processed} ${word}`
+          continue
+        }
+        if (process.browser) {
+          processed = `${processed} <span class="value">${window.numeral(word).format(0,0)}</span>`
+        } else {
+          processed = `${processed} <span class="value">${word}</span>`
+        }
+      }
+
+      return processed
+
+    },
+  },
 }
 </script>
 

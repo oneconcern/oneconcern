@@ -2,7 +2,7 @@
 #Carousel(tabindex="1",@keyup.down="next",@keyup.up="prev")
   transition(name="carousel")
     .carousel(
-      v-for="carousel, cindex in data",
+      v-for="carousel, cindex in data_filtered",
       :key="cindex",
       v-if="cindex === index")
       img.carousel-background(
@@ -13,22 +13,68 @@
         .carousel-title {{ carousel.title }}
         .carousel-description {{ carousel.description }}
         .carousel-cta
-          CtaButton(:link="carousel.cta.link",:name="carousel.cta.name",theme="orange-border")
+          CtaButton(:link="localePath(carousel.cta.link)",:name="carousel.cta.name",theme="orange-border")
   .carousel-dots
     .carousel-dot(
       @click="dot(cindex)",
-      v-for="carousel, cindex in data"
+      v-for="carousel, cindex in data_filtered"
       :class="{filled: cindex === index}")
       .carousel-dot-inner
 </template>
 <script>
-import CtaButton from '~/components/buttons/CtaButton.vue'
+import CtaButton from '@/components/buttons/CtaButton'
+import locale from '@/mixins/locale'
 export default {
   components: { CtaButton },
+  mixins: [ locale ],
   props: {
     data: {
       required: true,
       type: Array,
+    }
+  },
+  data () {
+    return {
+      scrolling: false,
+      index: 0,
+      timer: false,
+      interval: 6,
+      element: false,
+      hammer: false,
+    }
+  },
+  computed: {
+    data_filtered () {
+      return this.data.filter( entry => entry.locale.includes(this.locale) )
+    },
+  },
+  beforeDestroy () {
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = false
+    }
+  },
+
+  mounted () {
+
+    if (process.browser && window.Hammer) {
+      this.timer = setInterval(() => {
+        (this.index === this.data_filtered.length - 1) ? this.index = 0 : this.index++
+      }, this.interval*1000)
+      this.element = document.getElementById('Carousel')
+      this.element.addEventListener('wheel', this.wheel)
+      this.hammer = new window.Hammer.Manager(this.element)
+      this.hammer.add(new window.Hammer.Swipe())
+      this.hammer.on('swipe', this.swipe)
+    }
+  },
+  destroyed () {
+    this.timer = false
+    if (process.browser && this.element !== false && this.element !== null) {
+      this.element.removeEventListener('wheel', this.wheel)
+      if (this.hammer) {
+        this.hammer.off('swipe', this.swipe)
+      }
     }
   },
   methods: {
@@ -38,12 +84,12 @@ export default {
     },
     next () {
       if (this.scrolling) return true
-      this.index = (this.index === this.data.length - 1) ? 0 : this.index+1 
+      this.index = (this.index === this.data_filtered.length - 1) ? 0 : this.index+1
       this.pause()
     },
     prev () {
       if (this.scrolling) return true
-      this.index = (this.index === 0) ? this.data.length-1 : this.index-1 
+      this.index = (this.index === 0) ? this.data_filtered.length-1 : this.index-1
       this.pause()
     },
     pause () {
@@ -70,46 +116,11 @@ export default {
         return this.prev()
     },
   },
-  created () {
 
-    this.timer = setInterval(() => { 
-      (this.index === this.data.length - 1) ? this.index = 0 : this.index++ 
-    }, this.interval*1000)
-  },
-
-  mounted () {
-
-    if (process.browser && window.Hammer) {
-      this.element = document.getElementById('Carousel')
-      this.element.addEventListener('wheel', this.wheel)
-      this.hammer = new window.Hammer.Manager(this.element)
-      this.hammer.add(new window.Hammer.Swipe())
-      this.hammer.on('swipe', this.swipe)
-    }
-  },
-  destroyed () {
-    this.timer = false
-    if (process.browser && this.element !== false && this.element !== null) {
-      this.element.removeEventListener('wheel', this.wheel)
-      if (this.hammer) {
-        this.hammer.off('swipe', this.swipe)
-      }
-    }
-  },
-  data () {
-    return {
-      scrolling: false,
-      index: 0,
-      timer: false,
-      interval: 6,
-      element: false,
-      hammer: false,
-    }
-  }
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 @import '../../assets/stylus/guide/includes/*'
 
 #Carousel

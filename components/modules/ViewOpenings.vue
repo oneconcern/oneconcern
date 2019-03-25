@@ -1,11 +1,9 @@
 <template lang="pug">
-.section.section-openings
-  .title(v-in-viewport.once) We’re assembling a team
-  .title(v-in-viewport.once) of world class individuals.
-  .title(v-in-viewport.once) Interested in joining us? 
+.section.section-openings(v-if="is_en")
+  .title(v-in-viewport.once,v-html="copys.openingsTitle")
   CtaButton(
     v-in-viewport.once
-    name="VIEW OPENINGS",
+    :name="copys.openingsButton",
     theme="white-border-hoverblack",
     link="careers"
   )
@@ -14,14 +12,17 @@
 <script>
 import inViewportDirective from 'vue-in-viewport-directive'
 import CtaButton from '~/components/buttons/CtaButton'
+import { mapGetters } from 'vuex'
 export default {
   components: { CtaButton },
   directives: { 'in-viewport': inViewportDirective },
   props: {
-    image: {
-      type: String
-    }
-  }
+    copys: {
+      type: Object,
+      required: true,
+    },
+  },
+  computed: { ...mapGetters(['is_en', 'is_not_en', 'is_jp']), },
 }
 </script>
 

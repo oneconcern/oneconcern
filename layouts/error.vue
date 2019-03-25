@@ -12,23 +12,13 @@
 import CtaButton from '~/components/buttons/CtaButton'
 export default {
   components: { CtaButton },
-  props: ['error'],
+  props: {
+    error: {
+      type: [Error,Object],
+      required: true,
+    }
+  },
   layout: 'default',
-  head () {
-    return  {
-      script: [
-        { src: '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js' }
-      ],
-      link: [
-        { rel: 'stylesheet', href: '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/agate.min.css' },
-      ]
-    }
-  },
-  mounted () {
-    if (process.browser && window.hljs) {
-      window.hljs.initHighlightingOnLoad()
-    }
-  },
 }
 </script>
 

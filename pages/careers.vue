@@ -1,41 +1,55 @@
 <template lang="pug">
 #Careers.page
-  .hero(:style="`background-image: url(${lowres})`")
+  PageHero(:lowres="lowres",:image="image",:copy="copy")
     img.hero-background(:src="image")
     .hero-gradient
-    .hero-title  {{ copy }}
     .hero-cta
       CtaButton(
         link="https://jobs.lever.co/oneconcern",
-        name="SEE OPPORTUNITIES",
+        :name="copys.oppButton",
         theme="orange-border")
 
   ScrollDown
-  CareersGallery(:images="gallery")
+  CareersGallery(:images="gallery",:copys="copys")
 
-  PerksBenefits(:perks="perks",v-if="perks")
-  OpenPositions(:jobs="jobs",v-if="jobs")
+  PerksBenefits(:perks="perks",v-if="perks",:copys="copys")
+  OpenPositions(:jobs="jobs",v-if="jobs",:copys="copys")
 
 </template>
 
 <script>
-import { createClient } from '~/plugins/contentful.js'
+import { createClient } from '@/plugins/contentful.js'
 import inViewportDirective from 'vue-in-viewport-directive'
-import CareersGallery from '~/components/pages/careers/CareersGallery'
-import PerksBenefits from '~/components/pages/careers/PerksBenefits'
-import OpenPositions from '~/components/pages/careers/OpenPositions'
-import ScrollDown from '~/components/modules/ScrollDown'
-import CtaButton from '~/components/buttons/CtaButton'
+import CareersGallery from '@/components/pages/careers/CareersGallery'
+import PerksBenefits from '@/components/pages/careers/PerksBenefits'
+import OpenPositions from '@/components/pages/careers/OpenPositions'
+import ScrollDown from '@/components/modules/ScrollDown'
+import CtaButton from '@/components/buttons/CtaButton'
 const client = createClient()
-import jobs from '~/static/cache/lever.json'
+import jobs from '@/static/cache/lever.json'
+import PageHero from '@/components/modules/PageHero'
 export default {
-  components: { CareersGallery, PerksBenefits, OpenPositions, CtaButton, ScrollDown },
+  components: { CareersGallery, PerksBenefits, OpenPositions, CtaButton, ScrollDown, PageHero },
   directives: { 'in-viewport': inViewportDirective },
-  async asyncData ({ app }) {
+  data () {
+    return {
+      jobs: jobs,
+    }
+  },
+  async asyncData ({ app, params, store }) {
 
-    const hero = await client.getEntries({'content_type': 'hero','fields.page': 'careers'})
-    const perksBenefits = await client.getEntries({'content_type': 'perksBenefits'})
-    const careersGallery = await client.getEntries({'content_type': 'careersGallery', order: 'fields.number'})
+    let iso = { en: 'en-US', jp: 'ja' }
+    let locale = iso[store.state.i18n.locale]
+
+    const copy = await client.getEntries({locale: locale, 'content_type': 'careersCopy'})
+    const hero = await client.getEntries({locale: locale, 'content_type': 'hero','fields.page': 'careers'})
+    const perksBenefits = await client.getEntries({locale: locale, 'content_type': 'perksBenefits'})
+    const careersGallery = await client.getEntries({locale: locale, 'content_type': 'careersGallery', order: 'fields.number'})
+
+    let copys = {}
+    for (let entry of copy.items) {
+      copys[entry.fields.name] = entry.fields.copy
+    }
 
     let perks = []
     let gallery = []
@@ -59,13 +73,9 @@ export default {
       copy: hero.items[0].fields.copy,
       gallery: gallery,
       perks: perks,
+      copys: copys,
     }
 
-  },
-  data () {
-    return {
-      jobs: jobs,
-    }
   },
 }
 </script>

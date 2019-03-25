@@ -8,89 +8,32 @@
       nuxt-link.close(to="/blog")
         .fa.fa-times
     .hero-title(v-else) {{ copy }}
-  FeaturedPosts(:posts="featured",v-if="tag === ''")
-  RecentUpdates(:posts="posts",:title="tag === ''",v-if="tag !== ''")
-  RecentUpdates(:posts="allposts",:title="true")
-  PopularTags(:tags="tags",v-if="tags")
-  ViewOpenings
+  FeaturedPosts(:posts="featured",v-if="tag === ''",:copys="copys")
+  RecentUpdates(:posts="posts",:title="tag === ''",v-if="tag !== ''",:copys="copys")
+  RecentUpdates(:posts="allposts",:title="true",:copys="copys")
+  PopularTags(v-if="tags && is_en",:tags="tags",:copys="copys")
+  ViewOpenings(:copys="aboutCopys")
 </template>
 
 <script>
-import { createClient } from '~/plugins/contentful.js'
-import FeaturedPosts from '~/components/pages/blog/FeaturedPosts'
-import RecentUpdates from '~/components/pages/blog/RecentUpdates'
-import PopularTags from '~/components/pages/blog/PopularTags'
-import ViewOpenings from '~/components/modules/ViewOpenings'
+import { createClient } from '@/plugins/contentful.js'
+import FeaturedPosts from '@/components/pages/blog/FeaturedPosts'
+import RecentUpdates from '@/components/pages/blog/RecentUpdates'
+import PopularTags from '@/components/pages/blog/PopularTags'
+import ViewOpenings from '@/components/modules/ViewOpenings'
 const client = createClient()
+import { mapGetters } from 'vuex'
 export default {
-
   components: { FeaturedPosts, RecentUpdates, ViewOpenings, PopularTags },
-
-  async asyncData ( context ) {
-
-    const hero = await client.getEntries({'content_type': 'hero','fields.page': 'blog'})
-    const entriesCreated = await client.getEntries({'content_type': 'blog', order: '-fields.created'})
-    const entriesFeatured = await client.getEntries({'content_type': 'blog', order: '-fields.featured'})
-
-    let posts = []
-    let featured = []
-    let tags = {}
-
-    for (let entry of entriesCreated.items) {
-
-      let post = entryPost(entry)
-
-      posts.push(post)
-
-      for (let tag in post.tags) {
-        if (post.tags[tag] in tags) {
-          tags[post.tags[tag]]++
-        } else {
-          tags[post.tags[tag]] = 1
-        }
-      }
-
-    }
-
-    for (let entry of entriesFeatured.items) {
-
-      let post = entryPost(entry)
-
-      if (entry.fields.featured > 0) {
-        featured.push(post)
-      }
-
-    }
-
-    function entryPost(entry) {
-
-      return {
-        id: entry.sys.id,
-        featured: entry.fields.featured,
-        type: entry.fields.type,
-        date: entry.fields.created,
-        image: entry.fields.image ? entry.fields.image.fields.file.url : false,
-        title: entry.fields.title,
-        tags: entry.fields.tags,
-        author: {
-          image: entry.fields.author ? entry.fields.author.fields.image.fields.file.url : false,
-          name: entry.fields.author ? entry.fields.author.fields.name : false,
-          position: entry.fields.author ? entry.fields.author.fields.position : false,
-        },
-        link: entry.fields.link,
-      }
-
-    }
-
+  data () {
     return {
-      copy: hero.items[0].fields.copy,
-      allposts: posts,
-      allfeatured: featured,
-      unsortedTags: tags,
+      allposts: [],
+      allfeatured: [],
+      tag: '',
     }
   },
-
   computed: {
+    ...mapGetters(['is_en', 'is_not_en', 'is_jp']),
 
     tags () {
 
@@ -133,17 +76,91 @@ export default {
 
   },
 
+
+  async asyncData ({ app, params, store }) {
+
+    let iso = { en: 'en-US', jp: 'ja' }
+    let locale = iso[store.state.i18n.locale]
+
+    const hero = await client.getEntries({locale: locale, 'content_type': 'hero','fields.page': 'blog'})
+    const entriesCreated = await client.getEntries({locale: locale, 'content_type': 'blog', order: '-fields.created'})
+    const entriesFeatured = await client.getEntries({locale: locale, 'content_type': 'blog', order: '-fields.featured'})
+
+    const aboutCopy = await client.getEntries({locale: locale, 'content_type': 'aboutCopy'})
+    const blogCopy = await client.getEntries({locale: locale, 'content_type': 'blogCopy'})
+
+    let copys = {}
+    for (let entry of blogCopy.items)
+      copys[entry.fields.name] = entry.fields.copy
+
+    let aboutCopys = {}
+    for (let entry of aboutCopy.items)
+      aboutCopys[entry.fields.name] = entry.fields.copy
+
+    let posts = []
+    let featured = []
+    let tags = {}
+
+    for (let entry of entriesCreated.items) {
+
+      let post = entryPost(entry)
+
+      posts.push(post)
+
+      for (let tag in post.tags) {
+        if (post.tags[tag] in tags) {
+          tags[post.tags[tag]]++
+        } else {
+          tags[post.tags[tag]] = 1
+        }
+      }
+
+    }
+
+    for (let entry of entriesFeatured.items) {
+
+      let post = entryPost(entry)
+
+      if (entry.fields.featured > 0) {
+        featured.push(post)
+      }
+
+    }
+
+    function entryPost(entry) {
+
+      return {
+        id: entry.sys.id,
+        featured: entry.fields.featured,
+        type: entry.fields.type,
+        date: entry.fields.created,
+        image: entry.fields.image ? entry.fields.image.fields.file.url : false,
+        title: entry.fields.title,
+        tags: entry.fields.tags,
+        locale: entry.fields.locale,
+        author: {
+          image: entry.fields.author ? entry.fields.author.fields.image.fields.file.url : false,
+          name: entry.fields.author ? entry.fields.author.fields.name : false,
+          position: entry.fields.author ? entry.fields.author.fields.position : false,
+        },
+        link: entry.fields.link,
+      }
+
+    }
+
+    return {
+      copy: hero.items[0].fields.copy,
+      allposts: posts,
+      allfeatured: featured,
+      unsortedTags: tags,
+      aboutCopys: aboutCopys,
+      copys: copys,
+    }
+  },
+
   mounted () {
     this.tag = this.$route.hash.replace('#', '')
   },
 
-  data () {
-    return {
-      allposts: [],
-      allfeatured: [],
-      tag: '',
-    }
-  },
-    
 }
 </script>

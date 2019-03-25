@@ -25,7 +25,7 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 @import '../../../assets/stylus/guide/includes/*'
 
 .section-ProductAllow
@@ -77,9 +77,8 @@ export default {
   .allow
     width 100%
     padding 10px
+  .allow-svg
+    display none
   .allow-copy
     margin 0 20px
-
-
-
 </style>

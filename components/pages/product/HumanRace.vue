@@ -30,9 +30,11 @@ export default {
   props: {
     title: {
       type: String,
+      required: true,
     },
     copy: {
       type: Array,
+      required: true,
     }
   },
 
@@ -118,6 +120,7 @@ export default {
       height auto
       .body
         width auto
+        height 400px
         .image
           display none
           width 50%

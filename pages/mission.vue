@@ -1,8 +1,6 @@
 <template lang="pug">
-#What 
-  .hero(:style="`background-image: url(${lowres})`")
-    img.hero-background(:src="image")
-    .hero-title {{ copy }}
+#What
+  PageHero(:lowres="lowres",:image="image",:copy="copy")
   ScrollDown
   ContentBlock(
     v-for="content, index in contents",
@@ -13,24 +11,36 @@
     :image="content.image",
     :ctaName="content.ctaName",
     :ctaLink="content.ctaLink")
-  ViewOpenings
+  ViewOpenings(:copys="aboutCopys")
 </template>
 
 <script>
-import { createClient } from '~/plugins/contentful.js'
+import { createClient } from '@/plugins/contentful.js'
 const client = createClient()
-import ContentBlock from '~/components/modules/ContentBlock'
-import CtaButton from '~/components/buttons/CtaButton'
-import ScrollDown from '~/components/modules/ScrollDown'
-import ViewOpenings from '~/components/modules/ViewOpenings'
+import ContentBlock from '@/components/modules/ContentBlock'
+import CtaButton from '@/components/buttons/CtaButton'
+import ScrollDown from '@/components/modules/ScrollDown'
+import ViewOpenings from '@/components/modules/ViewOpenings'
+import PageHero from '@/components/modules/PageHero'
 export default {
-  components: { ContentBlock, CtaButton, ViewOpenings, ScrollDown },
-  async asyncData () {
+  components: { ContentBlock, CtaButton, ViewOpenings, ScrollDown, PageHero, },
+  async asyncData ({ app, params, store }) {
+
+    let iso = { en: 'en-US', jp: 'ja' }
+    let locale = iso[store.state.i18n.locale]
+
+    const aboutCopy = await client.getEntries({
+      locale: locale,
+      'content_type': 'aboutCopy'
+    })
+
     const hero = await client.getEntries({
+      locale: locale,
       'content_type': 'hero',
       'fields.page': 'mission'
     })
     const contentEntries = await client.getEntries({
+      locale: locale,
       'content_type': 'contentBlock',
       'fields.page': 'mission',
       order: 'fields.order',
@@ -48,13 +58,19 @@ export default {
       })
     }
 
+    let aboutCopys = {}
+    for (let entry of aboutCopy.items) {
+      aboutCopys[entry.fields.name] = entry.fields.copy
+    }
+
     return {
       lowres: hero.items[0].fields.lowres.fields.file.url,
       image: hero.items[0].fields.image.fields.file.url,
       copy: hero.items[0].fields.copy,
       contents: contents,
+      aboutCopys: aboutCopys,
     }
- 
+
   }
 }
 </script>

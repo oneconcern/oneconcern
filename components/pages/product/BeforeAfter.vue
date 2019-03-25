@@ -12,6 +12,7 @@
     .ba-line(:class="`ba-line-${active}`")
     transition(name="fade")
       .ba-content(
+        :class="{'ba-content-jp': $store.state.i18n.locale === 'jp'}"
         v-for="item, index in items",
         :key="index",
         v-if="index === active")
@@ -25,17 +26,18 @@ export default {
   props: {
     items: {
       type: Array,
+      required: true,
+    }
+  },
+  data () {
+    return {
+      active: 0,
     }
   },
   methods: {
     par (copy) {
       return copy.split("\n")
     },
-  },
-  data () {
-    return {
-      active: 0,
-    }
   },
 }
 </script>
@@ -113,6 +115,8 @@ export default {
   width 700px
   color white
   font-s1()
+  &.ba-content-jp
+    font-size 20px
 
 @media all and (min-width: 1px) and (max-width: 1000px)
   #BeforeAfter
@@ -136,4 +140,4 @@ export default {
 
 
 </style>
- 
+

@@ -9,9 +9,11 @@ exports.store = function (results) {
 
   let routes = []
   for (let entry of results.items) {
-    routes.push(`/blog/${slug(entry.fields.title)}-${entry.sys.id}`)
+    if (entry.fields.type !== 'link')
+      routes.push(`/blog/${slug(entry.fields.title)}-${entry.sys.id}`)
+      routes.push(`/jp/blog/one-concern-${entry.sys.id}`)
   }
-  routes.push('/error')
+  // routes.push('/error')
 
   fs.writeFileSync('./static/cache/routes.json', JSON.stringify(routes, null, 2))
 

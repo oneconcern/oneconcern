@@ -1,13 +1,11 @@
 <template lang="pug">
 #Who.page
-  .hero(:style="`background-image: url(${lowres})`")
-    img.hero-background(:src="image")
-    .hero-title {{ copy }}
+  PageHero(:lowres="lowres",:image="image",:copy="copy")
 
   ScrollDown
   .section.section-story(v-if="story")
 
-    .title(v-in-viewport.once) Our Story
+    .title(v-in-viewport.once) {{ copys.ourStoryTitle }}
     .subsections
       .subsection(v-in-viewport.once)
         video(controls,:poster="story.poster")
@@ -16,36 +14,54 @@
         p(v-for="block in storyCopy") {{ block }}
 
   .section.section-team
-    .title(v-in-viewport.once) Meet Our Team
+    .title(v-in-viewport.once) {{ copys.ourTeamTitle }}
 
     OurTeam(:team="team",v-if="team")
-    .title(v-in-viewport.once) Get to know the team
+    .title(v-in-viewport.once) {{ copys.knowTeamTitle }}
     CtaButton(
       v-in-viewport.once
-      name="LinkedIn",
+      :name="copys.linkedInButton",
       theme="white-border",
       link="https://www.linkedin.com/search/results/people/?facetCurrentCompany=%5B%226441806%22%5D")
 
-  ViewOpenings
+  ViewOpenings(:copys="copys")
 </template>
 
 <script>
-import { createClient } from '~/plugins/contentful.js'
+import { createClient } from '@/plugins/contentful.js'
 import inViewportDirective from 'vue-in-viewport-directive'
-import ViewOpenings from '~/components/modules/ViewOpenings'
-import CtaButton from '~/components/buttons/CtaButton'
-import ScrollDown from '~/components/modules/ScrollDown'
-import OurTeam from '~/components/pages/about/OurTeam'
+import ViewOpenings from '@/components/modules/ViewOpenings'
+import PageHero from '@/components/modules/PageHero'
+import CtaButton from '@/components/buttons/CtaButton'
+import ScrollDown from '@/components/modules/ScrollDown'
+import OurTeam from '@/components/pages/about/OurTeam'
 const client = createClient()
 export default {
 
-  components: { CtaButton, OurTeam, ViewOpenings, ScrollDown },
+  components: { CtaButton, OurTeam, ViewOpenings, ScrollDown, PageHero },
   directives: { 'in-viewport': inViewportDirective },
-  async asyncData () {
+  data () {
+    return {
+      filter: false,
+    }
+  },
+  computed: {
+    storyCopy () {
+      return this.story.copy.split("\n")
+    },
+  },
+  async asyncData ({ app, params, store }) {
+    let iso = { en: 'en-US', jp: 'ja' }
+    let locale = iso[store.state.i18n.locale]
 
-    const hero = await client.getEntries({'content_type': 'hero','fields.page': 'about'})
-    const story = await client.getEntries({'content_type': 'aboutContent'})
-    const members = await client.getEntries({ 'content_type': 'team', order: 'fields.order'})
+    const copy = await client.getEntries({locale: locale, 'content_type': 'aboutCopy'})
+    const hero = await client.getEntries({locale: locale, 'content_type': 'hero','fields.page': 'about'})
+    const story = await client.getEntries({locale: locale, 'content_type': 'aboutContent'})
+    const members = await client.getEntries({locale: locale,  'content_type': 'team', order: 'fields.order'})
+
+    let copys = {}
+    for (let entry of copy.items)
+      copys[entry.fields.name] = entry.fields.copy
 
     let team = []
     for (let member of members.items) {
@@ -68,6 +84,7 @@ export default {
         poster: story.items[0].fields.storyPoster.fields.file.url,
       },
       team: team,
+      copys: copys,
     }
   },
 
@@ -77,19 +94,7 @@ export default {
     },
   },
 
-  computed: {
-    storyCopy () {
-      return this.story.copy.split("\n")
-    },
 
-  },
-
-  data () {
-    return {
-      filter: false,
-    }
-  },
-        
 }
 </script>
 
