@@ -1,6 +1,7 @@
 <template lang="pug">
 .section.section-ProductAllow
   .title {{ title }}
+  .subtitle {{ subtitle }}
 
   .allows
     .allow(v-for="allow in allows")
@@ -17,6 +18,10 @@ export default {
       type: String,
       required: true,
     },
+    subtitle: {
+      type: String,
+      required: true,
+    },
     allows: {
       type: Array,
       required: true,
@@ -25,7 +30,7 @@ export default {
 }
 </script>
 
-<style lang="stylus" scoped>
+<style lang="stylus">
 @import '../../../assets/stylus/guide/includes/*'
 
 .section-ProductAllow
@@ -52,12 +57,11 @@ export default {
       .allow-copy
         inViewportBottom((0.1 * i + 0.2), 0.5)
 
-.allow-svg
-  width 100px
-  height 100px
-  > svg
-    width inherit
-    height inherit
+.allow .allow-svg svg
+  fill white
+  width 60px
+  height 60px
+
 
 .allow-copy
   flex-align center
@@ -68,6 +72,12 @@ export default {
 
 .title
   color white
+  margin 0 0 40px 0
+.subtitle
+  max-width 700px
+  margin auto
+  color white
+  font-s6()
 
 @media all and (min-width: 1px) and (max-width: 1000px)
   .allows
@@ -78,7 +88,11 @@ export default {
     width 100%
     padding 10px
   .allow-svg
-    display none
+    width 60px
+    height 60px
+    > svg
+      width inherit !important
+      height inherit !important
   .allow-copy
     margin 0 20px
 </style>
