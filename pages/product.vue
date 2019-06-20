@@ -12,7 +12,7 @@
     .copy(v-in-viewport.once) {{ copys.quoteTop }}
   HumanRace(:title="copys.titleHumanRace",:copy="copys.HumanRace")
   FeaturedCaseStudy(:copy="copys.CaseStudy",:buttonCopy="copys.featuredCaseStudyButton")
-  DigitalFingerprints(:title="copys.fingerprintsTitle",:copy="copys.fingerprintsCopy")
+  //DigitalFingerprints(:title="copys.fingerprintsTitle",:copy="copys.fingerprintsCopy")
   QuoteMonitor(v-if="copys.quoteMonitor",:copy="copys.quoteMonitor")
   BeforeAfter(:items="copys.BeforeAfter")
   .demo-cta
