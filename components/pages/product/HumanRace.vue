@@ -50,12 +50,13 @@ export default {
 @import '../../../assets/stylus/guide/includes/*'
 #HumanRace
   padding 60px 0
-  background-color blue-charcoal
+  background-color midnight-express
   text-align center
   color white
   .title
     font-h4()
     inViewportBottom()
+    margin-bottom 30px
   .labels
     //padding 30px
     .label

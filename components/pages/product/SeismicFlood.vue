@@ -3,17 +3,16 @@
 .section.section-SeismicFlood
   .sf-menu
     a.sf-item(:class="{'is-active': selection == 'seismic'}",@click="selection = 'seismic'") {{ copy.buttonSeismic }}
-    a.sf-item(:class="{'is-active': selection == 'flood'}",@click="selection = 'flood'") {{ copy.buttonFlood }}
+    //a.sf-item(:class="{'is-active': selection == 'flood'}",@click="selection = 'flood'") {{ copy.buttonFlood }}
 
   .sf-content
-    transition(name="fade")
+    transition(name="fade",mode="out-in")
       .sf-body(v-if="selection == 'seismic'",key="seismic")
 
         .sf-image(v-in-viewport.once)
           img(:src="`${seismic.image}`")
         .sf-list
-          ul
-            li(v-in-viewport.once,v-for="item in seismic.list") {{ item }}
+            p(v-in-viewport.once,v-for="item in seismic.list") {{ item }}
 
       .sf-body(v-if="selection == 'flood'",key="flood")
 
@@ -72,7 +71,7 @@ export default {
 .section-SeismicFlood
   max-width 1200px
   margin auto
-  padding 0 0 60px 0
+  padding 60px 0
 
 .sf-menu
   width 400px
@@ -84,7 +83,7 @@ export default {
 
 .sf-item
   cursor pointer
-  width 100px
+  width 200px
   margin 0 20px
   padding 10px
   color white
@@ -116,15 +115,17 @@ export default {
 
 .sf-list
   padding-left 50px
-  ul
+  ul, p
     padding 0
     max-width 400px
-    li
-      inViewportBottom(0.1, 0.5)
-      padding 5px 0
-      color white
-      text-align left
-      font-s6()
+  li, p
+    inViewportBottom(0.1, 0.5)
+    padding 5px 0
+    color white
+    text-align left
+    font-s6()
+  p:first-child
+    font-s1()
 
 @media all and (min-width: 1px) and (max-width: 1000px)
   .sf-menu

@@ -5,13 +5,13 @@
 
   UserStories(v-if="stories.length > 0",:stories="stories",:title="titles[1]")
   ProductAllow(:allows="allows",:title="titles[2]",:subtitle="titles[3]")
-  SeismicFlood(:data="seismicFlood",:copy="seismicFloodCopy")
   OrangeBlock(:copys="copys")
+  SeismicFlood(:data="seismicFlood",:copy="seismicFloodCopy")
 
   //.quote
     .copy(v-in-viewport.once) {{ copys.quoteTop }}
-  HumanRace(:title="copys.titleHumanRace",:copy="copys.HumanRace")
   FeaturedCaseStudy(:copy="copys.CaseStudy",:buttonCopy="copys.featuredCaseStudyButton")
+  HumanRace(:title="copys.titleHumanRace",:copy="copys.HumanRace")
   //DigitalFingerprints(:title="copys.fingerprintsTitle",:copy="copys.fingerprintsCopy")
   QuoteMonitor(v-if="copys.quoteMonitor",:copy="copys.quoteMonitor")
   BeforeAfter(:items="copys.BeforeAfter")
@@ -133,6 +133,7 @@ export default {
     for (let entry of productAllow.items) {
       allows.push({
         icon: entry.fields.icon,
+        title: entry.fields.title,
         copy: entry.fields.copy,
       })
     }
@@ -209,7 +210,7 @@ export default {
     margin auto
     inViewportBottom(0, 0.5)
 .demo-cta
-  background-color blue-charcoal
+  background-color midnight-express
   padding 60px 0
   .cta
     text-align center

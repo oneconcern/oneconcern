@@ -10,7 +10,7 @@
         .ba-selection-vector(v-html="item.vector")
         .ba-selection-title {{ item.title }}
     .ba-line(:class="`ba-line-${active}`")
-    transition(name="fade")
+    transition(name="fade",mode="out-in")
       .ba-content(
         :class="{'ba-content-jp': $store.state.i18n.locale === 'jp'}"
         v-for="item, index in items",
@@ -47,6 +47,8 @@ export default {
 
 #BeforeAfter
   background-color fire-bush
+  background carrot-fire
+  background-size 200% 200%
   padding 60px 0
   height 500px
 
@@ -103,13 +105,13 @@ export default {
 
 .ba-selection.active
   .ba-selection-title
-    color blue-charcoal
+    color midnight-express
   .ba-selection-vector > svg
-    stroke blue-charcoal
+    stroke midnight-express
 
 .ba-selection:nth-child(2).active
   .ba-selection-vector > svg
-    fill blue-charcoal
+    fill midnight-express
 
 .ba-content
   width 700px
@@ -131,7 +133,7 @@ export default {
       border-bottom 1px solid transparent
     .ba-selection.active
       .ba-selection-title
-        border-bottom 1px solid blue-charcoal
+        border-bottom 1px solid midnight-express
     .ba-content
       width auto
       font-s2()
