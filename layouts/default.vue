@@ -19,24 +19,32 @@ export default {
       meta: {
         en: {
           title: 'One Concern',
-          description: 'Artificial Intelligence platform for Disasters',
+          description: 'Artificial Intelligence Platform for Disasters',
         },
         jp: {
-          title: 'jp title placeholder',
-          description: 'jp description placeholder',
+          title: 'One Concern (ワン・コンサーン)',
+          description: '「災害の発生前・発生時・発生後に人命と暮らしを守ること」をミッションに、AIなどの最先端のテクノロジーを活用した災害予測と防災・減災システムを提供',
         },
       }
     }
   },
 
   head () {
+    const i18nSeo = this.$nuxtI18nSeo()
     return {
-      title: this.meta[this.$store.state.i18n.locale].title,
+      htmlAttrs: {
+        ...i18nSeo.htmlAttrs,
+      },
+      title: this.meta[this.$i18n.locale].title,
       meta: [
         {
           hid: 'description', name: 'description',
-          content: this.meta[this.$store.state.i18n.locale].description
+          content: this.meta[this.$i18n.locale].description
         },
+        ...i18nSeo.meta,
+      ],
+      link: [
+        ...i18nSeo.link,
       ]
     }
   },
