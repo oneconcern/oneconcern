@@ -2,7 +2,7 @@
 #Carousel(tabindex="1",@keyup.down="next",@keyup.up="prev")
   transition(name="carousel")
     .carousel(
-      v-for="carousel, cindex in data_filtered",
+      v-for="(carousel, cindex) in data_filtered",
       :key="cindex",
       v-if="cindex === index")
       img.carousel-background(
@@ -14,10 +14,10 @@
         .carousel-description {{ carousel.description }}
         .carousel-cta
           CtaButton(:link="localePath(carousel.cta.link)",:name="carousel.cta.name",theme="orange-border")
-  .carousel-dots
+  .carousel-dots(v-if="data_filtered.length > 1")
     .carousel-dot(
       @click="dot(cindex)",
-      v-for="carousel, cindex in data_filtered"
+      v-for="(carousel, cindex) in data_filtered"
       :class="{filled: cindex === index}")
       .carousel-dot-inner
 </template>
@@ -45,7 +45,7 @@ export default {
   },
   computed: {
     data_filtered () {
-      return this.data.filter( entry => entry.locale.includes(this.locale) )
+      return this.data.filter( entry => entry.locale.includes(this.$i18n.locale) )
     },
   },
   beforeDestroy () {
